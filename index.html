@@ -1,0 +1,920 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flaikkys Web</title>
+<link rel="icon" type="image/x-icon" href="images/Icon.png">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+  -webkit-user-select: none; /* Safari */
+  -ms-user-select: none; /* IE 10 and IE 11 */
+  user-select: none; /* Standard syntax */
+
+        }
+        .collapsible {
+            background-color: #f4f4f4;
+            color: #444;
+            cursor: pointer;
+            padding: 1rem;
+            width: 100%;
+            border: none;
+            text-align: left;
+            outline: none;
+            font-size: 1rem;
+            transition: 0.4s;
+            border-radius: 0.5rem;
+            margin-bottom: 0.75rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            border: 1px solid #e0e0e0;
+        }
+
+        .active, .collapsible:hover {
+            background-color: #ddd;
+        }
+
+        .collapsible-content {
+            padding: 0 1rem;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.2s ease-out;
+            background-color: #fff;
+            border-radius: 0.5rem;
+            margin-bottom: 0.75rem;
+            border: 1px solid #e0e0e0;
+        }
+
+        .collapsible-content.show {
+            max-height: 10000px;
+        }
+
+        .popup {
+
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.5);
+            opacity: 0;
+            transition: opacity 0.3s ease-in-out;
+        }
+
+        .popup.show {
+            display: flex;
+            opacity: 1;
+		animation: popup 0.7s;
+        }
+@keyframes popup {
+  0%{
+  opacity: 0;
+transform: scale(1.4)
+  }
+  30%{
+  opacity: 0;
+transform: scale(1.1)
+  }
+  100%{
+  opacity: 1;
+transform: scale(1)
+  }
+}
+
+
+        .popup-content {
+            background-color: #fff;
+            margin: 5% auto;
+            padding: 2rem;
+            border: 1px solid #888;
+            width: 80%;
+            border-radius: 0.5rem;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: stretch;
+            transform: translateY(-20px);
+            transition: transform 0.3s ease-in-out;
+        }
+
+        .popup.show .popup-content {
+             transform: translateY(0);
+        }
+
+        .popup-close {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            color: #aaa;
+            font-size: 2rem;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .popup-close:hover,
+        .popup-close:focus {
+            color: #000;
+            text-decoration: none;
+        }
+
+        .slide {
+            display: none;
+            width: 100%;
+            border-radius: 0.5rem;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .slide img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        .slideshow-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 1rem;
+            position: relative;
+        }
+
+        .prev, .next {
+            cursor: pointer;
+            width: auto;
+            padding: 0.5rem 1rem;
+            margin: 0;
+            color: white;
+            font-weight: bold;
+            font-size: 1.25rem;
+            transition: 0.6s ease;
+            border-radius: 0.375rem;
+            background-color: #3b82f6;
+            opacity: 0.7;
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 2;
+        }
+
+        .prev {
+            left: 1rem;
+        }
+        .next{
+            right: 1rem;
+        }
+
+        .prev:hover, .next:hover {
+            opacity: 1;
+        }
+
+        .text {
+            color: #f2f2f2;
+            font-size: 1rem;
+            padding: 0.5rem 0.75rem;
+            position: absolute;
+            bottom: 0.5rem;
+            width: 100%;
+            text-align: center;
+            border-radius: 0.375rem;
+            background-color: rgba(0,0,0,0.5);
+            z-index: 1;
+        }
+
+        .product-image {
+            object-fit: cover;
+            width: 100%;
+            border-radius: 0.375rem;
+            transition: transform 0.2s ease-in-out;
+        }
+
+        .product-image:hover {
+            animation: shake 0.5s infinite;
+        }
+        @keyframes shake {
+  0% { transform: translate(1px, 1px) rotate(0deg); }
+  10% { transform: translate(-1px, -2px) rotate(-1deg); }
+  20% { transform: translate(-3px, 0px) rotate(1deg); }
+  30% { transform: translate(3px, 2px) rotate(0deg); }
+  40% { transform: translate(1px, -1px) rotate(1deg); }
+  50% { transform: translate(-1px, 2px) rotate(-1deg); }
+  60% { transform: translate(-3px, 1px) rotate(0deg); }
+  70% { transform: translate(3px, 1px) rotate(-1deg); }
+  80% { transform: translate(-1px, -1px) rotate(1deg); }
+  90% { transform: translate(1px, 2px) rotate(0deg); }
+  100% { transform: translate(1px, -2px) rotate(-1deg); }
+}
+
+        @keyframes rotate {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
+        }
+
+        #dot-container {
+            text-align: center;
+            margin-top: 1rem;
+        }
+
+        .dot {
+            cursor: pointer;
+            height: 0.75rem;
+            width: 0.75rem;
+            margin: 0 0.25rem;
+            background-color: #bbb;
+            border-radius: 50%;
+            display: inline-block;
+            transition: background-color 0.6s ease;
+        }
+
+        .active-dot, .dot:hover {
+            background-color: #3b82f6;
+        }
+        .fade {
+          animation-name: fade;
+          animation-duration: 1.5s;
+        }
+
+        @keyframes fade {
+          from {opacity: .4}
+          to {opacity: 1}
+        }
+
+        .product-popup {
+            background-color: #fff;
+            border-radius: 0.5rem;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            align-items: stretch;
+            max-width: 80%;
+            margin: auto;
+            position: relative;
+        }
+
+        .product-popup-content {
+          display: flex;
+          flex-direction: column;
+          gap: 1rem;
+        }
+
+
+        @media (min-width: 768px) {
+            .product-popup-content{
+                flex-direction: row;
+            }
+        }
+
+        .product-popup-image-container {
+          flex: 1;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+        }
+
+
+        .product-popup-image {
+          max-width: 100%;
+          max-height: 300px;
+          object-fit: contain;
+          border-radius: 0.5rem;
+        }
+
+
+        .product-popup-details {
+          flex: 1;
+          display: flex;
+          flex-direction: column;
+          gap: 1rem;
+        }
+
+        .product-popup-title {
+          font-size: 1.5rem;
+          font-weight: bold;
+          color: #222;
+          margin-bottom: 0.5rem;
+        }
+
+        .product-popup-price {
+          font-size: 1.25rem;
+          font-weight: bold;
+          color: #e62e0d;
+          margin-bottom: 0.5rem;
+        }
+
+        .product-popup-description {
+          font-size: 1rem;
+          color: #555;
+          margin-bottom: 1rem;
+          line-height: 1.5;
+        }
+
+        .product-popup-info{
+            font-size: 0.8rem;
+            color: #666;
+        }
+
+        .product-popup-actions {
+          display: flex;
+          gap: 1rem;
+          margin-top: 1rem;
+          flex-wrap: wrap;
+        }
+
+
+        .add-to-cart-button {
+          background-color: #3b82f6;
+          color: #fff;
+          padding: 0.75rem 1.5rem;
+          border: none;
+          border-radius: 0.5rem;
+          font-size: 1rem;
+          cursor: pointer;
+          transition: background-color 0.3s ease;
+          white-space: nowrap;
+        }
+
+        .add-to-cart-button:hover {
+          background-color: #2563eb;
+        }
+
+
+        .buy-now-button {
+          background-color: #8b5cf6;
+          color: #fff;
+          padding: 0.75rem 1.5rem;
+          border: none;
+          border-radius: 0.5rem;
+          font-size: 1rem;
+          cursor: pointer;
+          transition: background-color 0.3s ease;
+          white-space: nowrap;
+        }
+
+        .buy-now-button:hover {
+          background-color: #7c3aed;
+        }
+
+        .popup-close {
+          position: absolute;
+          top: 1rem;
+          right: 1rem;
+          color: #aaa;
+          font-size: 2rem;
+          font-weight: bold;
+          cursor: pointer;
+        }
+
+        .popup-close:hover,
+        .popup-close:focus {
+          color: #000;
+          text-decoration: none;
+        }
+
+    </style>
+</head>
+<body class="bg-gray-100">
+    <header class="bg-black text-white py-4 rounded-b-md shadow-md fixed w-full top-0 z-50">
+        <div class="container mx-auto flex justify-between items-center">
+            <h1 class="text-2xl font-semibold transition-transform hover:scale-110">Flaikky</h1>
+            <nav class="flex gap-4">
+                <a href="#about-me" class="text-white hover:text-gray-300 focus:outline-none focus:shadow-outline nav-link">
+                    About
+                </a>
+                <a href="#products" class="text-white hover:text-gray-300 focus:outline-none focus:shadow-outline nav-link">
+                    Products
+                </a>
+                <a href="#media" class="text-white hover:text-gray-300 focus:outline-none focus:shadow-outline nav-link">
+                    Media
+                </a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container mx-auto mt-8 p-4" style="margin-top: 80px;">
+        <section id="about-me" class="mb-6 transition-all duration-500">
+            <h2 class="text-xl font-semibold mb-4 text-gray-800">Hello!</h2>
+            <div class="flex items-center gap-6">
+                <img src="images/PFP.png" class="rounded-md" style="width: 30%; border-radius: 0.75rem;">
+                <p class="text-gray-700">
+Hey, I’m Flaikky. I make things — mostly in 3D. I do animation, modeling, texturing, game stuff, and sometimes music too.
+
+I like bringing ideas to life, whether it’s a short animation, a game scene, or a full character. I’m always learning new things and trying to get better at what I do. Most of what I create comes from a mix of curiosity, creativity, and just enjoying the process.
+
+If you’re into digital art, games, or creative projects in general, you’ll probably find something here you’ll like.
+
+
+                </p>
+            </div>
+        </section>
+
+<section id="products" class="mb-6 transition-all duration-500">
+            <button class="collapsible">Products</button>
+            <div class="collapsible-content">
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 p-4">
+                    <div class="bg-white rounded-md shadow-md p-4">
+                        <img src="images/Buy/FlaikkyPlush.gif" alt="FlaikkyPlush" class="product-image">
+                        <h3 class="text-lg font-semibold mt-2 text-gray-800">Flaikky Plush</h3>
+                        <p class="text-gray-600 mb-2">Your little companion!</p>
+                        <p class="text-gray-900 font-bold">$19.99</p>
+                        <button onclick="openPopup('product1')" class="mt-2 bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-md transition-colors duration-300">View Details</button>
+                    </div>
+                    <div class="bg-white rounded-md shadow-md p-4">
+                        <img src="images/Buy/FlaikkyMousePad.png" alt="FlaikkyMousePad" class="product-image">
+                        <h3 class="text-lg font-semibold mt-2 text-gray-800">Flaikky MousePad</h3>
+                        <p class="text-gray-600 mb-2">If you think MousePads are cool</p>
+                        <p class="text-gray-900 font-bold">$24.99</p>
+                        <button onclick="openPopup('product2')" class="mt-2 bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-md transition-colors duration-300">View Details</button>
+                    </div>
+                    <div class="bg-white rounded-md shadow-md p-4">
+                        <img src="images/Buy/FlaikkyMerch.png" alt="FlaikkyMerch" class="product-image">
+                        <h3 class="text-lg font-semibold mt-2 text-gray-800">Flaikky Merch</h3>
+                        <p class="text-gray-600 mb-2">Look at them big eyes!</p>
+                        <p class="text-gray-900 font-bold">$29.99</p>
+                        <button onclick="openPopup('product3')" class="mt-2 bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-md transition-colors duration-300">View Details</button>
+                    </div>
+                    <div class="bg-white rounded-md shadow-md p-4">
+                        <img src="images/Buy/FlaikkyKeychain.png" alt="FlaikkyKeychain" class="product-image">
+                        <h3 class="text-lg font-semibold mt-2 text-gray-800">Flaikky Keychain</h3>
+                        <p class="text-gray-600 mb-2">Hang on little buddy</p>
+                        <p class="text-gray-900 font-bold">$10</p>
+                        <button onclick="openPopup('product4')" class="mt-2 bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-md transition-colors duration-300">View Details</button>
+                    </div>
+                    <div class="bg-white rounded-md shadow-md p-4">
+                        <img src="images/Buy/Flaik18.png" alt="18+ Pass" class="product-image">
+                        <h3 class="text-lg font-semibold mt-2 text-gray-800">Flaikky 18+ Pass</h3>
+                        <p class="text-gray-600 mb-2">For a good time</p>
+                        <p class="text-gray-900 font-bold">19.99</p>
+<div style="position: relative; width: 100%; height: 60px; overflow: hidden;">
+  <button 
+    id="runaway-btn"
+    class="absolute bg-indigo-500 text-white font-bold py-2 px-4 rounded-md transition-all duration-300"
+    style="top: 15px; left: 0;"
+    onmouseenter="runAway(event)"
+    onclick="window.open('https://www.youtube.com/watch?v=QB7ACr7pUuE', '_blank');"
+  >
+    View Details
+  </button>
+</div>
+
+
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="3d-models" class="mb-6 transition-all duration-500">
+            <div class="slideshow-container rounded-md overflow-hidden">
+
+                <div class="slide fade">
+                    <img src="images/Items/novaGasmask.png" alt="novaGasmask">
+                    <div class="text">NovaGasmask.</div>
+                </div>
+
+                <div class="slide fade">
+                    <img src="images/Items/NovaGlasses.png" alt="NovaGlasses">
+                    <div class="text">NovaGlasses.</div>
+                </div>
+
+                <div class="slide fade">
+                    <img src="images/Items/Techwear.png" alt="Techwear">
+                    <div class="text">Techwear.</div>
+                </div>
+
+                <div class="slide fade">
+                    <img src="images/Items/Techwear.png" alt="Techwear">
+                    <div class="text">Techwear.</div>
+                </div>
+
+                <div class="slideshow-controls">
+                    <a class="prev" onclick="plusSlides(-1)">❮</a>
+                    <a class="next" onclick="plusSlides(1)">❯</a>
+                </div>
+            </div>
+            <div id="dot-container" class="mt-4 flex justify-center">
+                <span class="dot" onclick="currentSlide(1)"></span>
+                <span class="dot" onclick="currentSlide(2)"></span>
+                <span class="dot" onclick="currentSlide(3)"></span>
+                <span class="dot" onclick="currentSlide(4)"></span>
+
+            </div>
+        </section>
+
+        <section id="media" class="mb-6 transition-all duration-500">
+            <button class="collapsible">Media</button>
+            <div class="collapsible-content">
+		<p style="color: white;">ough</p>
+ 		<section class="mb-6 transition-all duration-500">
+           	 <button class="collapsible">Art</button>
+           	 <div class="collapsible-content">
+               	 <p class="text-gray-700 p-4">
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 p-4">
+
+                    <div>
+                        <img src="images/Media/cakey.png" alt="Media 1" class="rounded-md w-full">
+			<a target="_blank" href="https://twitter.com/FathomFloof"><div class="mt-2 bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-md transition-colors duration-300">Made by Tempa</div></a>
+                    </div>
+
+                    <div>
+                        <img src="images/Media/FlaikkyTL3.png" alt="Media 1" class="rounded-md w-full">
+			<a target="_blank" href="https://twitter.com/DraggyAvali"><div class="mt-2 bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-md transition-colors duration-300">Made by Draggy</div></a>
+                    </div>
+
+                    <div>
+                        <video width="100%" controls class="rounded-md">
+                            <source src="images/Media/SorenAnim2.mp4" type="video/mp4">
+                            Your browser does not support the video tag.
+                        </video>
+			<a target="_blank" href="https://twitter.com/BoringSoren"><div class="mt-2 bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-md transition-colors duration-300">Made by BoringSoren</div></a>
+                    </div>
+
+                    <div>
+                        <img src="images/Media/ProtoFlaik.png" alt="Media 1" class="rounded-md w-full">
+			<a target="_blank" href="https://twitter.com/FunkyCan"><div class="mt-2 bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-md transition-colors duration-300">Made by FunyCan</div></a>
+                    </div>
+
+                    <div>
+                        <img src="images/Media/Dawnart.png" alt="Media 1" class="rounded-md w-full">
+			<a target="_blank" href="https://twitter.com/Dawnyart"><div class="mt-2 bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-md transition-colors duration-300">Made by Dawn</div></a>
+                    </div>
+
+                    <div>
+                        <video width="100%" controls class="rounded-md">
+                            <source src="images/Media/DeltaAnim.mp4" type="video/mp4">
+                            Your browser does not support the video tag.
+                        </video>
+			<a target="_blank" href="https://twitter.com/delta_vee"><div class="mt-2 bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-md transition-colors duration-300">Made by Delta.V</div></a>
+                    </div>
+
+                    <div>
+                        <img src="images/Media/Draggyart3.png" alt="Media 1" class="rounded-md w-full">
+			<a target="_blank" href="https://twitter.com/DraggyAvali"><div class="mt-2 bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-md transition-colors duration-300">Made by Draggy</div></a>
+                    </div>
+
+                    <div>
+                        <img src="images/Media/SquidgameDelta.png" alt="Media 1" class="rounded-md w-full">
+			<a target="_blank" href="https://twitter.com/delta_vee"><div class="mt-2 bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-md transition-colors duration-300">Made by Delta.V</div></a>
+                    </div>
+
+                    <div>
+                        <img src="images/Media/DraggyArt2.png" alt="Media 1" class="rounded-md w-full">
+			<a target="_blank" href="https://twitter.com/DraggyAvali"><div class="mt-2 bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-md transition-colors duration-300">Made by Draggy</div></a>
+                    </div>
+
+                    <div>
+                        <img src="images/Media/Dawn.png" alt="Media 1" class="rounded-md w-full">
+			<a target="_blank" href="https://bsky.app/profile/ranadi.bsky.social"><div class="mt-2 bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-md transition-colors duration-300">Made by Ranadi</div></a>
+                    </div>
+
+                    <div>
+                        <img src="images/Media/Star1.png" alt="Media 1" class="rounded-md w-full">
+			<a target="_blank" href="https://staravali.neocities.org"><div class="mt-2 bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-md transition-colors duration-300">Made by blackstar277</div></a>
+                    </div>
+
+                    <div>
+                        <img src="images/Media/CoffeekatfloofArt.png" alt="Media 1" class="rounded-md w-full">
+			<a target="_blank" href="https://artfight.net/~sollybikky"><div class="mt-2 bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-md transition-colors duration-300">Made by Coffeekatfloof</div></a>
+                    </div>
+
+                    <div>
+                        <img src="images/Media/Porple.png" alt="Media 1" class="rounded-md w-full">
+			<a target="_blank" href="https://artfight.net/~sollybikky"><div class="mt-2 bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-md transition-colors duration-300">Made by sollybikky</div></a>
+                    </div>
+
+                    <div>
+                        <img src="images/Media/CatcrispstArt.png" alt="Media 1" class="rounded-md w-full">
+			<a target="_blank" href="https://artfight.net/~Catcrisps"><div class="mt-2 bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-md transition-colors duration-300">Made by CatcrispstArt</div></a>
+                    </div>
+
+                    <div>
+                        <img src="images/Media/LightArt.png" alt="Media 1" class="rounded-md w-full">
+			<a target="_blank" href="https://artfight.net/~Lighteren"><div class="mt-2 bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-md transition-colors duration-300">Lighteren</div></a>
+                    </div>
+
+                    <div>
+                        <img src="images/Media/flak_fin_no_text.png" alt="Media 1" class="rounded-md w-full">
+			<a target="_blank" href="https://twitter.com/delta_vee"><div class="mt-2 bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-md transition-colors duration-300">Made by Delta.V</div></a>
+                    </div>
+
+                    <div>
+                        <img src="images/Media/antiFlaik1.png" alt="Media 1" class="rounded-md w-full">
+			<a target="_blank" href="https://twitter.com/AnonAntibody"><div class="mt-2 bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-md transition-colors duration-300">Made by AnonAntibody</div></a>
+                    </div>
+
+                    <div>
+                        <img src="images/Media/Flaikky_the_silly.png" alt="Media 1" class="rounded-md w-full">
+			<a target="_blank" href="https://twitter.com/ChebyPattern"><div class="mt-2 bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-md transition-colors duration-300">Made by ChebyPattern</div></a>
+                    </div>
+
+                    <div>
+                        <img src="images/Media/JacketPd1.png" alt="Media 1" class="rounded-md w-full">
+			<a target="_blank" href="https://bsky.app/profile/did:plc:moe6y4hmhrkh3jhrvoldoqr3"><div class="mt-2 bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-md transition-colors duration-300">Made by JacketPd</div></a>
+                    </div>
+
+                    <div>
+                        <video width="100%" controls class="rounded-md">
+                            <source src="images/Media/SorenAnim1.mp4" type="video/mp4">
+                            Your browser does not support the video tag.
+                        </video>
+			<a target="_blank" href="https://twitter.com/BoringSoren"><div class="mt-2 bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-md transition-colors duration-300">Made by BoringSoren</div></a>
+                    </div>
+
+                    <div>
+                        <img src="images/Media/secretsanta2.png" alt="Media 1" class="rounded-md w-full">
+			<a target="_blank" href="https://twitter.com/FathomFloof"><div class="mt-2 bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-md transition-colors duration-300">Made by Tempa</div></a>
+                    </div>
+
+                </div>         
+            </div>
+        </section>
+
+ 		<section class="mb-6 transition-all duration-500">
+           	 <button class="collapsible">My Art</button>
+           	 <div class="collapsible-content">
+               	 <p class="text-gray-700 p-4">
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 p-4">
+
+                    <div>
+                        <img src="images/MyArt/Flaikky_SpookDance.gif" alt="Media 1" class="rounded-md w-full">
+                    </div>
+		<p>IM LAZY!!! MORE SOON.. maybe</p>
+                   
+                </div>         
+            </div>
+        </section>
+            </div>
+        </section>
+
+        <section class="mb-6 transition-all duration-500">
+            <button class="collapsible">Gumroad</button>
+            <div class="collapsible-content">
+                <p class="text-gray-700 p-4">
+<iframe src="https://flaikkytheavali.gumroad.com" height="1000px" width="100%" title="Iframe Example"></iframe>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="bg-gray-800 text-white py-4 text-center rounded-t-md shadow-md mt-8 transition-all duration-500">
+        <p>©FlaikkyWeb. All rights reserved.</p>
+<a href="https://twitter.com/Flaikky1" class="text-blue-500 hover:text-blue-700" target="_blank">
+    <i class="fab fa-twitter text-xl"></i> Twitter
+</a>
+<a href="https://www.tiktok.com/@flaikky" class="text-purple-500 hover:text-purple-700" target="_blank">
+    <i class="fab fa-tiktok text-xl"></i> TikTok
+</a>
+<a href="https://www.youtube.com/@Flaikky" class="text-red-500 hover:text-red-700" target="_blank">
+    <i class="fab fa-youtube text-xl"></i> YouTube
+</a>
+<a href="https://flaikkytheavali.gumroad.com" class="text-pink-500 hover:text-pink-700" target="_blank">
+    <i class="fab fa-gumroad text-xl"></i> Gumroad
+</a>
+    </footer>
+
+    <div id="product1" class="popup">
+        <div class="popup-content">
+            <span class="popup-close" onclick="closePopup('product1')">&times;</span>
+            <div class="flex flex-col md:flex-row gap-8 items-start">
+                <img src="images/Buy/FlaikkyPlush.gif" alt="Product 1" class="product-image mb-4 md:mb-0 rounded-md" style="height:80%">
+                <div>
+                    <h2 class="text-xl font-semibold mb-2 text-gray-800">Flaikky Plush</h2>
+                    <p class="text-gray-700 mb-4">
+After spending way too much time doing absolutely nothing, Flaikky is ready to come home with you and do absolutely nothing there too.
+
+This is a collectible artwork and not a toy. Do not give to children under 12 years old or pets.
+Flaikky is about 8 inches from head to toe, perfect for lounging around or just adding some good vibes to your life.
+</p>
+                    <p class="text-gray-900 font-bold mb-4">$19.99</p>
+                    <a href="https://www.makeship.com/products/Flaikky-plush" target="_blank" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-md inline-block transition-colors duration-300">Buy Now</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="product2" class="popup">
+        <div class="popup-content">
+            <span class="popup-close" onclick="closePopup('product2')">&times;</span>
+             <div class="flex flex-col md:flex-row gap-8 items-start">
+                <img src="images/Buy/FlaikkyMousePad.png" alt="Product 2" class="product-image mb-4 md:mb-0 rounded-md" style="height:80%">
+                <div>
+                    <h2 class="text-xl font-semibold mb-2 text-gray-800">Flaikky MousePad</h2>
+                    <p class="text-gray-700 mb-4">
+Flaikky is here to bring the perfect mix of chill and function to your desk. Whether you’re working, gaming, or just avoiding responsibility, this mousepad has your back.
+
+It’s the perfect size to keep your mouse from falling off the edge while looking like it’s been designed by someone who definitely knows how to relax.
+
+Each Flaikky mousepad may have a slightly different alignment or a subtle quirk in the design. Don’t worry, it’s still absolutely perfect. Flaikky is about 9x7 inches of soft, smooth surface, ideal for any activity that requires you to stay seated for an unreasonable amount of time.
+</p>
+                    <p class="text-gray-900 font-bold mb-4">$24.99</p>
+                    <a href="#" target="_blank" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-md inline-block transition-colors duration-300">Buy Now</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="product3" class="popup">
+        <div class="popup-content">
+            <span class="popup-close" onclick="closePopup('product3')">&times;</span>
+            <div class="flex flex-col md:flex-row gap-8 items-start">
+                <img src="images/Buy/FlaikkyMerch.png" alt="Product 3" class="product-image mb-4 md:mb-0 rounded-md" style="height:80%">
+                <div>
+                    <h2 class="text-xl font-semibold mb-2 text-gray-800">Flaikky Merch</h2>
+                    <p class="text-gray-700 mb-4">
+After a series of tragic events, including the incident, you can now bring their melancholic energy straight to your shirt. Wear it or wear it while you cry about your struggles. even sad Flaikky have their off days. The Flaikky Merch is printed on a high-quality shirt that’s perfect for those days when you want to look like you’re just vibing, but deep down, you're questioning everything.
+</p>
+                    <p class="text-gray-900 font-bold mb-4">$29.99</p>
+                    <a href="https://www.youtube.com/watch?v=b3rNUhDqciM" target="_blank" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-md inline-block transition-colors duration-300">Buy Now</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<div id="product4" class="popup">
+        <div class="popup-content">
+            <span class="popup-close" onclick="closePopup('product4')">&times;</span>
+            <div class="flex flex-col md:flex-row gap-8 items-start">
+                <img src="images/Buy/FlaikkyKeyChain.png" alt="Product 4" class="product-image mb-4 md:mb-0 rounded-md" style="height:80%">
+                <div>
+                    <h2 class="text-xl font-semibold mb-2 text-gray-800">Flaikky Merch</h2>
+                    <p class="text-gray-700 mb-4">
+Flaikky’s here to keep your keys company, though you may find that it’s always slightly rearranging things when you’re not looking. It’s small, it’s soft, and it’s the perfect little companion to keep your essentials together—whether you want it to or not.
+
+Made with attention to detail and the right amount of charm, this keychain adds a subtle touch of personality to anything you clip it to. At just 3 inches, Flaikky is small enough to go unnoticed but memorable enough to make you smile every time you grab your keys.
+</p>
+                    <p class="text-gray-900 font-bold mb-4">$29.99</p>
+                    <a href="#" target="_blank" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-md inline-block transition-colors duration-300">Buy Now</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<script>
+function runAway(event) {
+    const button = event.target;
+    const container = button.parentElement;
+
+    const mouseX = event.clientX;
+    const containerRect = container.getBoundingClientRect();
+    const buttonRect = button.getBoundingClientRect();
+
+    const maxX = container.clientWidth - button.offsetWidth;
+
+    let newX;
+
+    // Keep picking a new position until it's far from the mouse
+    do {
+        newX = Math.floor(Math.random() * maxX);
+    } while (
+        Math.abs(containerRect.left + newX - mouseX) < 80 // keeps it away from cursor
+    );
+
+    button.style.left = `${newX}px`;
+}
+</script>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const collapsibleButton = document.querySelector("#products .collapsible");
+    
+    if (collapsibleButton) {
+        // Give any collapsible setup script a moment to attach events first
+        setTimeout(() => {
+            collapsibleButton.click();
+        }, 100); // You can increase this delay slightly if needed
+    }
+});
+</script>
+
+<script>
+    let slideIndex = 0;
+    showSlides();
+    let autoSlideInterval;
+
+    document.querySelectorAll('.nav-link').forEach(anchor => {
+        anchor.addEventListener('click', function (e) {
+            e.preventDefault();
+
+            const targetId = this.getAttribute('href').substring(1);
+            const targetElement = document.getElementById(targetId);
+
+            if (targetElement) {
+                targetElement.scrollIntoView({
+                    behavior: 'smooth'
+                });
+            }
+        });
+    });
+
+    function plusSlides(n) {
+        clearTimeout(autoSlideInterval);
+        slideIndex += n;
+        showSlides();
+        autoSlideInterval = setInterval(showSlides, 5000);
+    }
+
+    function currentSlide(n) {
+        clearTimeout(autoSlideInterval);
+        slideIndex = n-1;
+        showSlides();
+        autoSlideInterval = setInterval(showSlides, 5000);
+    }
+
+    function showSlides() {
+        let i;
+        let slides = document.getElementsByClassName("slide");
+        let dots = document.getElementsByClassName("dot");
+        let prev = document.querySelector(".prev");
+        let next = document.querySelector(".next");
+
+        if (slides.length === 0) {
+            if (prev) prev.style.display = "none";
+            if (next) next.style.display = "none";
+            return;
+        } else {
+            if (prev) prev.style.display = "flex";
+            if (next) next.style.display = "flex";
+        }
+
+        if (slideIndex > slides.length - 1) {
+            slideIndex = 0
+        }
+        if (slideIndex < 0) {
+            slideIndex = slides.length - 1
+        }
+        for (i = 0; i < slides.length; i++) {
+            slides[i].style.display = "none";
+        }
+        for (i = 0; i < dots.length; i++) {
+            dots[i].className = dots[i].className.replace(" active-dot", "");
+        }
+        slides[slideIndex].style.display = "block";
+        dots[slideIndex].className += " active-dot";
+    }
+
+    autoSlideInterval = setInterval(showSlides, 5000);
+
+    var coll = document.getElementsByClassName("collapsible");
+    var i;
+
+    for (i = 0; i < coll.length; i++) {
+        coll[i].addEventListener("click", function() {
+            this.classList.toggle("active");
+            var content = this.nextElementSibling;
+            if (content.classList.contains('show')) {
+                content.classList.remove('show');
+            } else {
+                content.classList.add('show');
+            }
+        });
+    }
+
+    function openPopup(productId) {
+        const popup = document.getElementById(productId);
+        popup.classList.add('show');
+
+    }
+
+    function closePopup(productId) {
+        const popup = document.getElementById(productId);
+        popup.classList.remove('show');
+    }
+
+    document.querySelectorAll('header button').forEach(button => {
+        button.addEventListener('click', function() {
+        const dropdownId = this.nextElementSibling?.id;
+        if (dropdownId) {
+            const dropdown = document.getElementById(dropdownId);
+            if (dropdown) {
+                dropdown.classList.toggle('hidden');
+                const headerRect = this.getBoundingClientRect();
+                const dropdownRect = dropdown.getBoundingClientRect();
+
+                if (dropdownRect.bottom > window.innerHeight) {
+                    dropdown.style.top = (headerRect.top - dropdownRect.height - 10) + 'px';
+                } else {
+                     dropdown.style.top = headerRect.bottom + 'px';
+                }
+            }
+        }
+    });
+});
+
+document.addEventListener('click', (event) => {
+    document.querySelectorAll('header div[id$="-dropdown"]').forEach(dropdown => {
+        if (!dropdown.classList.contains('hidden') && !dropdown.contains(event.target) && event.target.tagName !== 'BUTTON') {
+            dropdown.classList.add('hidden');
+        }
+    });
+});
+</script>
+</body>
+</html>
